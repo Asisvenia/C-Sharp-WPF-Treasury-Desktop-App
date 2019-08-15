@@ -1,0 +1,946 @@
+﻿<Application x:Class="My_Treasury.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:My_Treasury"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        
+        <!--Solid colors-->
+        <SolidColorBrush x:Key="BlueBG" Color="#4BC5FF"/>
+        <SolidColorBrush x:Key="HoverItemBGColor" Color="#43B2E6"/>
+        <SolidColorBrush x:Key="MyYellow" Color="#FFED00"/>
+        <SolidColorBrush x:Key="TextBoxBG" Color="#4B82FF"/>
+        <SolidColorBrush x:Key="TextBoxHover" Color="#5475FF"/>
+        <SolidColorBrush x:Key="TextBoxOnFocused" Color="#4B4CFF"/>
+
+        <!--Last saved title-->
+        <Style x:Key="lastSavedLbl" TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="FontWeight" Value="ExtraBlack"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontStyle" Value="Italic"/>
+        </Style>
+        <!--Select a currency title-->
+        <Style x:Key="selectCurrencyTitle" TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="Sagoe Script"/>
+            <Setter Property="FontSize" Value="16.5"/>
+            <Setter Property="FontWeight" Value="ExtraBlack"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontStyle" Value="Italic"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect ShadowDepth="0.25" Color="#FF636363"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--Last saved value-->
+        <Style x:Key="lastSavedValue" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="21"/>
+            <Setter Property="FontWeight" Value="ExtraBlack"/>
+            <Setter Property="Foreground" Value="{StaticResource MyYellow}"/>
+            <Style.Triggers>
+                <!--*** OPACITY ANIMATION WHEN PROPERTY'S TEXT UPDATED *** 
+                (NOTE!: Don't forget to add NotifyOnTargetUpdated=True property to the xaml binding section.-->
+                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation 
+                                Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.35" />
+                            <ThicknessAnimation   
+                                Storyboard.TargetProperty="(TextBlock.Margin)" From="35 0 0 130"
+                                To="75 0 0 130"
+                                Duration="0:0:0.25"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+        <!--Treasure input box-->
+        <Style x:Key="treasureInputBox" TargetType="TextBox">
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Foreground" Value="{StaticResource MyYellow}"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBoxBase">
+                        <Border x:Name="border" Background="{StaticResource TextBoxBG}" 
+                                CornerRadius="4">
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="1" Color="Black"/>
+                                </Border.Effect>
+                            <ScrollViewer VerticalAlignment="Center" Margin="5 0 0 0" x:Name="PART_ContentHost"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsFocused" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <!--Color change-->
+                                <MultiTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0:0:0.5" Storyboard.TargetName="border" 
+                                                             Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
+                                                             From="#5475FF" To="#4B4CFF"/>
+                                            <DoubleAnimation Duration="0:0:0.2"
+                                                             Storyboard.TargetProperty="(TextBox.Width)" 
+                                                             To="145"/>
+                                            <DoubleAnimation Duration="0:0:0.2"
+                                                             Storyboard.TargetProperty="(TextBox.Height)" 
+                                                             To="30"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.EnterActions>
+                                <MultiTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0:0:0.5" Storyboard.TargetName="border" 
+                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
+                                                            To="#4B82FF"/>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                             Storyboard.TargetProperty="(TextBox.Width)" 
+                                                             To="120"/>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                             Storyboard.TargetProperty="(TextBox.Height)" 
+                                                             To="25"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.ExitActions>
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect ShadowDepth="3.3" Color="Black"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="CaretBrush" Value="{StaticResource MyYellow}"/>
+                                <Setter Property="SelectionBrush" Value="White"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsFocused" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource TextBoxHover}" />
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect ShadowDepth="2" Color="Black"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--Currency adding input box-->
+        <Style x:Key="currencyAddInputBox" TargetType="TextBox">
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Foreground" Value="{StaticResource MyYellow}"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBoxBase">
+                        <Border x:Name="border" Background="{StaticResource TextBoxBG}" 
+                                CornerRadius="4">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="1" Color="Black"/>
+                            </Border.Effect>
+                            <ScrollViewer VerticalAlignment="Center" Margin="5 0 0 0" x:Name="PART_ContentHost"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsFocused" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <!--Color change-->
+                                <MultiTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0:0:0.5" Storyboard.TargetName="border" 
+                                                             Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
+                                                             From="#5475FF" To="#4B4CFF"/>
+                                            <DoubleAnimation Duration="0:0:0.2"
+                                                             Storyboard.TargetProperty="(TextBox.Width)" 
+                                                             To="100"/>
+                                            <DoubleAnimation Duration="0:0:0.2"
+                                                             Storyboard.TargetProperty="(TextBox.Height)" 
+                                                             To="25"/>
+                                            <DoubleAnimation Duration="0:0:0.4" From="13.5" To="15" Storyboard.TargetProperty="FontSize"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.EnterActions>
+                                <MultiTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0:0:0.5" Storyboard.TargetName="border" 
+                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
+                                                            To="#4B82FF"/>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                             Storyboard.TargetProperty="(TextBox.Width)" 
+                                                             To="80"/>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                             Storyboard.TargetProperty="(TextBox.Height)" 
+                                                             To="20"/>
+                                            <DoubleAnimation Duration="0:0:0.4" From="15" To="13.5" Storyboard.TargetProperty="FontSize"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.ExitActions>
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect ShadowDepth="3.3" Color="Black"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="CaretBrush" Value="{StaticResource MyYellow}"/>
+                                <Setter Property="SelectionBrush" Value="White"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsFocused" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource TextBoxHover}" />
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect ShadowDepth="2" Color="Black"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--Save button-->
+        <Style x:Key="saveBtn" TargetType="Button">
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="4" BorderBrush="Black" BorderThickness="1"
+                                Background="{StaticResource MyYellow}">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="1.2" Color="#FF2E2E2E"/>
+                            </Border.Effect>
+                            <Label x:Name="label" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#782ED9"
+                                   Content="{TemplateBinding Content}">
+                            </Label>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0:0:0.3" Storyboard.TargetName="border" 
+                                                             Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
+                                                             From="#FFED00" To="#782ED9"/>
+                                            <ColorAnimation Duration="0:0:0.2" Storyboard.TargetName="label" 
+                                                             Storyboard.TargetProperty="(Label.Foreground).(SolidColorBrush.Color)" 
+                                                             From="#782ED9" To="#FFED00"/>
+                                            <DoubleAnimation Duration="0:0:0.2"
+                                                             Storyboard.TargetProperty="(Button.Width)" 
+                                                             To="90"/>
+                                            <DoubleAnimation Duration="0:0:0.2"
+                                                             Storyboard.TargetProperty="(Button.Height)" 
+                                                             To="30"/>
+                                            <DoubleAnimation Duration="0:0:0.2" From="12" To="14" 
+                                                             Storyboard.TargetProperty="FontSize"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0:0:0.3" Storyboard.TargetName="border" 
+                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
+                                                            To="#FFED00"/>
+                                            <ColorAnimation Duration="0:0:0.2" Storyboard.TargetName="label" 
+                                                             Storyboard.TargetProperty="(Label.Foreground).(SolidColorBrush.Color)" 
+                                                             From="#FFED00" To="#782ED9"/>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                             Storyboard.TargetProperty="(Button.Width)" 
+                                                             To="80"/>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                             Storyboard.TargetProperty="(Button.Height)" 
+                                                             To="25"/>
+                                            <DoubleAnimation Duration="0:0:0.2" From="14" To="12" 
+                                                             Storyboard.TargetProperty="FontSize"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect ShadowDepth="3" Color="Black"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--Short command buttons-->
+        <Style x:Key="shortCommandBtn" TargetType="Button">
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="4" BorderBrush="Black" BorderThickness="1"
+                                Background="{StaticResource MyYellow}">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="1.2" Color="#FF2E2E2E"/>
+                            </Border.Effect>
+                            <Label x:Name="label" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#782ED9"
+                                   Content="{TemplateBinding Content}">
+                            </Label>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0:0:0.3" Storyboard.TargetName="border" 
+                                                             Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
+                                                             From="#FFED00" To="#782ED9"/>
+                                            <ColorAnimation Duration="0:0:0.2" Storyboard.TargetName="label" 
+                                                             Storyboard.TargetProperty="(Label.Foreground).(SolidColorBrush.Color)" 
+                                                             From="#782ED9" To="#FFED00"/>
+                                            <DoubleAnimation Duration="0:0:0.2"
+                                                             Storyboard.TargetProperty="(Button.Width)" 
+                                                             To="60"/>
+                                            <DoubleAnimation Duration="0:0:0.2"
+                                                             Storyboard.TargetProperty="(Button.Height)" 
+                                                             To="27"/>
+                                            <DoubleAnimation Duration="0:0:0.2" From="11.5" To="14" 
+                                                             Storyboard.TargetProperty="FontSize"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0:0:0.3" Storyboard.TargetName="border" 
+                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
+                                                            To="#FFED00"/>
+                                            <ColorAnimation Duration="0:0:0.2" Storyboard.TargetName="label" 
+                                                             Storyboard.TargetProperty="(Label.Foreground).(SolidColorBrush.Color)" 
+                                                             From="#FFED00" To="#782ED9"/>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                             Storyboard.TargetProperty="(Button.Width)" 
+                                                             To="50"/>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                             Storyboard.TargetProperty="(Button.Height)" 
+                                                             To="25"/>
+                                            <DoubleAnimation Duration="0:0:0.2" From="14" To="11.5" 
+                                                             Storyboard.TargetProperty="FontSize"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect ShadowDepth="3" Color="Black"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Duration="0:0:0.5" To="0.25" 
+                                                             Storyboard.TargetProperty="Opacity"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Duration="0:0:0.4" To="1" 
+                                                             Storyboard.TargetProperty="Opacity"/>
+ 
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--Long command buttons-->
+        <Style x:Key="longCommandBtn" TargetType="Button">
+            <Setter Property="Width" Value="67"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="4" BorderBrush="Black" BorderThickness="1"
+                                Background="{StaticResource MyYellow}">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="1.2" Color="#FF2E2E2E"/>
+                            </Border.Effect>
+                            <Label x:Name="label" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#782ED9"
+                                   Content="{TemplateBinding Content}">
+                            </Label>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0:0:0.3" Storyboard.TargetName="border" 
+                                                             Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
+                                                             From="#FFED00" To="#782ED9"/>
+                                            <ColorAnimation Duration="0:0:0.2" Storyboard.TargetName="label" 
+                                                             Storyboard.TargetProperty="(Label.Foreground).(SolidColorBrush.Color)" 
+                                                             From="#782ED9" To="#FFED00"/>
+                                            <DoubleAnimation Duration="0:0:0.2"
+                                                             Storyboard.TargetProperty="(Button.Width)" 
+                                                             To="78"/>
+                                            <DoubleAnimation Duration="0:0:0.2"
+                                                             Storyboard.TargetProperty="(Button.Height)" 
+                                                             To="27"/>
+                                            <DoubleAnimation Duration="0:0:0.2" From="11.5" To="14" 
+                                                             Storyboard.TargetProperty="FontSize"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0:0:0.3" Storyboard.TargetName="border" 
+                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
+                                                            To="#FFED00"/>
+                                            <ColorAnimation Duration="0:0:0.2" Storyboard.TargetName="label" 
+                                                             Storyboard.TargetProperty="(Label.Foreground).(SolidColorBrush.Color)" 
+                                                             From="#FFED00" To="#782ED9"/>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                             Storyboard.TargetProperty="(Button.Width)" 
+                                                             To="67"/>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                             Storyboard.TargetProperty="(Button.Height)" 
+                                                             To="25"/>
+                                            <DoubleAnimation Duration="0:0:0.2" From="14" To="11.5" 
+                                                             Storyboard.TargetProperty="FontSize"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect ShadowDepth="3" Color="Black"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.3"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Duration="0:0:0.5" To="0.25" 
+                                                             Storyboard.TargetProperty="Opacity"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Duration="0:0:0.4" To="1" 
+                                                             Storyboard.TargetProperty="Opacity"/>
+
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--Currency add commands container-->
+        <Style x:Key="CurrencyAddCommandsCon" TargetType="StackPanel">
+            <Setter Property="Opacity" Value="0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=visibilityHolder, Path=Content}" Value="Visible">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Duration="0:0:0.5" To="1" 
+                                                             Storyboard.TargetProperty="Opacity"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Duration="0:0:0.33" To="0" 
+                                                             Storyboard.TargetProperty="Opacity"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+                <Trigger Property="Opacity" Value="0">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <!--Custom combobox toggle button-->
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="20" />
+                </Grid.ColumnDefinitions>
+                
+                <Border
+                    x:Name="Border" 
+                    Grid.ColumnSpan="2"
+                    CornerRadius="6"
+                    Background="#937FC7"
+                    BorderBrush="#404040"
+                    BorderThickness="1" />
+                <Border 
+                    Grid.Column="0"
+                    CornerRadius="6" 
+                    Margin="1" 
+                    Background="#6419B0" 
+                    BorderBrush="#404040"
+                    BorderThickness="0,0,1,0" />
+                 <Path 
+                    x:Name="Arrow"
+                    Grid.Column="1"     
+                    Fill="#5C3185"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Data="M 0 0 L 4 4 L 8 0 Z"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="ToggleButton.IsMouseOver" Value="true">
+                    <Setter TargetName="Border" Property="Background" Value="{StaticResource MyYellow}" />
+                </Trigger>
+                <Trigger Property="ToggleButton.IsChecked" Value="true">
+                    <Setter TargetName="Border" Property="Background" Value="#ABA737" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter TargetName="Border" Property="Background" Value="#EEEEEE" />
+                    <Setter TargetName="Border" Property="BorderBrush" Value="#AAAAAA" />
+                    <Setter Property="Foreground" Value="#888888"/>
+                    <Setter TargetName="Arrow" Property="Fill" Value="#888888" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
+            <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
+        </ControlTemplate>
+        <!--Custom combobox-->
+        <Style TargetType="{x:Type ComboBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="MinWidth" Value="130"/>
+            <Setter Property="MinHeight" Value="20"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                     <Grid>
+                        <ToggleButton 
+                            Name="ToggleButton" 
+                            Template="{StaticResource ComboBoxToggleButton}" 
+                            Grid.Column="2" 
+                            Focusable="false"
+                            IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                            ClickMode="Press">
+                         </ToggleButton>
+                        <ContentPresenter
+                            Name="ContentSite"
+                            IsHitTestVisible="False" 
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                            Margin="7,3,23,3"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left" />
+                        <TextBox x:Name="PART_EditableTextBox"
+                            Style="{x:Null}" 
+                            Template="{StaticResource ComboBoxTextBox}" 
+                            HorizontalAlignment="Left" 
+                            VerticalAlignment="Center" 
+                            Margin="3,3,23,3"
+                            Focusable="True" 
+                            Background="Transparent"
+                            Visibility="Hidden"
+                            IsReadOnly="{TemplateBinding IsReadOnly}"/>
+                        <Popup 
+                            Name="Popup"
+                            Placement="Bottom"
+                            IsOpen="{TemplateBinding IsDropDownOpen}"
+                            AllowsTransparency="True" 
+                            Focusable="False"
+                            PopupAnimation="Slide">
+                         <Grid 
+                              Name="DropDown"
+                              SnapsToDevicePixels="True"                
+                              MinWidth="{TemplateBinding ActualWidth}"
+                              MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                        <Border 
+                            x:Name="DropDownBorder"
+                            Background="#760BFA"
+                            BorderThickness="1"
+                            BorderBrush="#888888"/> 
+                        <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                        </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#888888"/>
+                            </Trigger>
+                            <Trigger Property="IsGrouping" Value="true">
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                            </Trigger>
+                            <Trigger SourceName="Popup" Property="Popup.AllowsTransparency" Value="true">
+                                <Setter TargetName="DropDownBorder" Property="CornerRadius" Value="4"/>
+                                <Setter TargetName="DropDownBorder" Property="Margin" Value="0,2,0,0"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable"
+                                  Value="true">
+                                <Setter Property="IsTabStop" Value="false"/>
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+            </Style.Triggers>
+        </Style>
+        <!--ComboBox Item -->
+        <Style TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Foreground" Value="{StaticResource MyYellow}"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border 
+                            Name="Border"
+                            Padding="2"
+                            CornerRadius="7"
+                            Background="#8069FA"
+                            SnapsToDevicePixels="true">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#4B4CFF"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#888888"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--Date-->
+        <Style x:Key="dateText" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="ExtraBlack"/>
+            <Setter Property="Foreground" Value="#FEFAFF"/>
+            <Style.Triggers>
+                <!--*** OPACITY ANIMATION WHEN PROPERTY'S TEXT UPDATED *** 
+                (NOTE!: Don't forget to add NotifyOnTargetUpdated=True property to the xaml binding section.-->
+                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                    <EventTrigger.Actions>
+                        <BeginStoryboard>
+                            <Storyboard TargetProperty="Opacity">
+                                <DoubleAnimation  Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger.Actions>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+        <!--Currency label-->
+        <Style x:Key="currencyLbl" TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="46"/>
+            <Setter Property="FontWeight" Value="ExtraBlack"/>
+            <Setter Property="Foreground">
+                <Setter.Value>
+                    <LinearGradientBrush EndPoint="0.2,1" StartPoint="0.1,0">
+                        <GradientStop Color="#DCDEE0" Offset="0"/>
+                        <GradientStop Color="#FFDF64" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Effect" >
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" Direction="270" ShadowDepth="11" Opacity=".8" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <!--*** OPACITY ANIMATION WHEN PROPERTY'S TEXT UPDATED *** 
+                (NOTE!: Don't forget to add NotifyOnTargetUpdated=True property to the xaml binding section.-->
+                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                    <EventTrigger.Actions>
+                        <BeginStoryboard>
+                            <Storyboard TargetProperty="Opacity">
+                                <DoubleAnimation  Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.25" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger.Actions>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+        <!--New currency label-->
+        <Style x:Key="newCurrencyLbl" TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="ExtraBlack"/>
+            <Setter Property="Foreground" Value="#43008A"/>
+        </Style>
+        <!--List item label-->
+        <Style x:Key="listItemLbl" TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="ExtraBlack"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <!--Custom seperator rectangle-->
+        <Style x:Key="seperatorRect" TargetType="Rectangle">
+            <Setter Property="Width" Value="3" />
+            <Setter Property="Stroke" Value="Wheat" />
+            <Setter Property="StrokeThickness" Value="3" />
+        </Style>
+        <!--Custom list view item-->
+        <Style x:Key="ListViewContainerStyle" TargetType="{x:Type ListViewItem}">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Padding" Value="4,1"/>
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListViewItem}">
+                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverItemBGColor}"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="CornerRadius" Value="9"/>
+                                <Setter TargetName="Bd" Property="BorderThickness" Value="2"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3EA6D6"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--Custom scrollbar's thumb-->
+        <Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Border x:Name="border"
+                                SnapsToDevicePixels="True"
+                                Background="#294F8F"
+                                CornerRadius="4"
+                                Opacity="0.3"
+                                Height="{TemplateBinding Height}"
+                                Width="{TemplateBinding Width}"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Duration="0:0:0.2" Storyboard.TargetName="border" 
+                                                             Storyboard.TargetProperty="Opacity" To="1"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Duration="0:0:0.2" Storyboard.TargetName="border" 
+                                                             Storyboard.TargetProperty="Opacity" To="0.3"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--Custom scrollbar-->
+        <Style x:Key="customScrollBar" TargetType="{x:Type ScrollBar}">
+            <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="false"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1,0" />
+            <Setter Property="Width" Value="14"/>
+            <Setter Property="MinWidth" Value="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid x:Name="Bg" SnapsToDevicePixels="true">
+
+                            <Border Padding="0 14" CornerRadius="12">
+                                <Track x:Name="PART_Track"
+                                        IsDirectionReversed="true"
+                                        Width="7"
+                                        IsEnabled="{TemplateBinding IsMouseOver}">
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton Opacity="0.2" Command="{x:Static ScrollBar.PageUpCommand}"/>
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Opacity="0.2" Command="{x:Static ScrollBar.PageDownCommand}"/>
+                                    </Track.IncreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb Style="{StaticResource ScrollBarThumb}"/>
+                                    </Track.Thumb>
+                                </Track>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Width" Value="Auto"/>
+                    <Setter Property="MinWidth" Value="0"/>
+                    <Setter Property="Height" Value="14"/>
+                    <Setter Property="MinHeight" Value="{DynamicResource {x:Static SystemParameters.HorizontalScrollBarHeightKey}}"/>
+                    <Setter Property="BorderThickness" Value="0,1" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ScrollBar}">
+                                <Grid x:Name="Bg" SnapsToDevicePixels="true">
+
+                                    <Border CornerRadius="12">
+                                        <Track x:Name="PART_Track"
+                                              Height="7"
+                                            IsEnabled="{TemplateBinding IsMouseOver}">
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Opacity="0.4" Command="{x:Static ScrollBar.PageLeftCommand}"/>
+                                        </Track.DecreaseRepeatButton>
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Opacity="0.4" Command="{x:Static ScrollBar.PageRightCommand}"/>
+                                        </Track.IncreaseRepeatButton>
+                                        <Track.Thumb>
+                                            <Thumb Style="{StaticResource ScrollBarThumb}"/>
+                                        </Track.Thumb>
+                                    </Track>
+                                  </Border>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <!--Developer head title-->
+        <Style x:Key="devTitle" x:Name="devText" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="Helvetica"/>
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontStyle" Value="Italic" />
+            <Setter Property="FontWeight" Value="ExtraBlack" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="Opacity" Value="0.35" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.85" />
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Duration="0:0:0.2" From="10" To="11" Storyboard.TargetProperty="FontSize"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Duration="0:0:0.2" From="11" To="10" Storyboard.TargetProperty="FontSize"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="devHyperLink" TargetType="{x:Type Hyperlink}">
+            <Setter Property="ForceCursor" Value="True" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontFamily" Value="Helvetica"/>
+            <Setter Property="FontStyle" Value="Italic" />
+            <Setter Property="FontWeight" Value="ExtraBlack" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="TextDecorations" Value=""/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="TextDecorations" Value="Underline"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Application.Resources>
+</Application>
